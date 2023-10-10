@@ -64,20 +64,11 @@ void ATurretPawn::OnSeePawn(APawn* Pawn)
 	Leg->SetWorldRotation(FRotator(FMath::Clamp(PawnRotator.Pitch, -20.f, 20.f), PawnRotator.Yaw, 0.f));
 	SetActorRotation(FRotator(0.f, PawnRotator.Yaw, 0.f));
 	
-	FString TheFloatStr = FString::SanitizeFloat(FMath::Clamp(PawnRotator.Pitch, -20.f, 20.f));
-
-	SpawnProjectile(SeenPawn);
+	SpawnProjectile();
 }
 
-void ATurretPawn::SpawnProjectile(APawn* Pawn)
+void ATurretPawn::SpawnProjectile()
 {
-	if (Pawn == nullptr)
-	{
-		return;
-	}
-
-	UKismetSystemLibrary::RetriggerableDelay(Pawn, 1.f, FLatentActionInfo());
-
 	UWorld* World = GetWorld();
 	if (World == nullptr)
 	{
