@@ -35,6 +35,10 @@ public:
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
+	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+
+	class UDroneMovementComponent* MovementComponent;
+
 private:
 	void MoveUp(float Amount);
 	void MoveRight(float Amount);

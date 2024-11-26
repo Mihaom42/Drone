@@ -11,6 +11,7 @@
 #include "Engine/StaticMesh.h"
 #include "Projectile/Projectile.h"
 #include "UI/DroneHUD.h"
+#include "Player/DroneMovementComponent.h"
 
 // Sets default values
 ADronePawn::ADronePawn()
@@ -36,6 +37,8 @@ ADronePawn::ADronePawn()
 	ProjectileSpawnLocation->SetupAttachment(RootComponent);
 	ProjectileSpawnLocation->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	
+	MovementComponent = CreateDefaultSubobject<UDroneMovementComponent>(TEXT("MovementComponent"));
+
 	TurnSpeed = 70.f;
 	CurrentForwardSpeed = 500.f;
 }
@@ -129,24 +132,28 @@ void ADronePawn::OnFire()
 
 void ADronePawn::MoveUp(float Amount)
 {
-	float TargetPitchSpeed = (Amount * TurnSpeed * -1.f);
+	MovementComponent->MoveToUp(Amount);
+
+	/*float TargetPitchSpeed = (Amount * TurnSpeed * -1.f);
 
 	TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
 
-	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);*/
 }
 
 void ADronePawn::MoveRight(float Amount)
 {
-	float TargetYawSpeed = (Amount * TurnSpeed);
+	MovementComponent->MoveToRight(Amount);
 
-	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	/*float TargetYawSpeed = (Amount * TurnSpeed);
 
-	const bool bIsTurning = FMath::Abs(Amount) > 0.2f;
+	//CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 
-	float TargetRollSpeed = bIsTurning ? (CurrentYawSpeed * 0.5f) : (GetActorRotation().Roll * -2.f);
+	//const bool bIsTurning = FMath::Abs(Amount) > 0.2f;
 
-	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	//float TargetRollSpeed = bIsTurning ? (CurrentYawSpeed * 0.5f) : (GetActorRotation().Roll * -2.f);
+
+	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);*/
 }
 
 void ADronePawn::DamageDrone(int32 DamagePoints)
