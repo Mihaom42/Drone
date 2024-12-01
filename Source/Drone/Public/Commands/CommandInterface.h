@@ -13,6 +13,12 @@ class UCommandInterface : public UInterface
 	GENERATED_BODY()
 };
 
+//UINTERFACE(MinimalAPI)
+//class UCreateSessionCommand : public UInterface
+//{
+//	GENERATED_BODY()
+//};
+
 /**
  * 
  */

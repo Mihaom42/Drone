@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Interfaces//OnlineSessionInterface.h"
+
 #include "DronePawn.generated.h"
 
 UCLASS()
@@ -22,6 +24,22 @@ public:
 
 	virtual void BeginPlay() override;
 
+private:
+	void MoveUp(float Amount);
+	void MoveRight(float Amount);
+	void OnFire();
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	void CreateGameSession();
+
+	void OnCreateGameSessionComplete(FName SessionName, bool bWasSuccessful);
+
+public:
+	void DamageDrone(int32 DamagePoints);
+	bool HealDrone(int32 HealthPoints);
+	bool PickAmmo(int32 PickedAmmo);
+
 public:
 	/** StaticMesh component that will be the visuals for our flying pawn */
 	UPROPERTY(Category = Mesh, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -36,13 +54,10 @@ public:
 	class UCameraComponent* Camera;
 
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-
 	class UDroneMovementComponent* MovementComponent;
 
-private:
-	void MoveUp(float Amount);
-	void MoveRight(float Amount);
-	void OnFire();
+	//Pointer to the online session interface
+	IOnlineSessionPtr OnlineSessionInterface;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
@@ -75,8 +90,17 @@ private:
 	float CurrentPitchSpeed;
 	float CurrentRollSpeed;
 
-public:
-	void DamageDrone(int32 DamagePoints);
-	bool HealDrone(int32 HealthPoints);
-	bool PickAmmo(int32 PickedAmmo);
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+
+//
+//protected:
+//	UFUNCTION(BlueprintCallable)
+//	void OpenLobby();
+//
+//	UFUNCTION(BlueprintCallable)
+//	void CallOpenLevel(const FString& Address);
+//
+//	UFUNCTION(BlueprintCallable)
+//	void CallClientTravel(const FString& Address);
+
 };

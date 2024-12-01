@@ -12,9 +12,12 @@
 #include "Projectile/Projectile.h"
 #include "UI/DroneHUD.h"
 #include "Player/DroneMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
 
 // Sets default values
-ADronePawn::ADronePawn()
+ADronePawn::ADronePawn() : CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateGameSessionComplete))
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -41,6 +44,25 @@ ADronePawn::ADronePawn()
 
 	TurnSpeed = 70.f;
 	CurrentForwardSpeed = 500.f;
+	
+	//CreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateGameSessionComplete);
+
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	if (OnlineSubsystem)
+	{
+		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Blue,
+				FString::Printf(TEXT("Found Subsystem: %s"), 
+					*OnlineSubsystem->GetSubsystemName().ToString())
+				);
+		}
+	}
 }
 
 void ADronePawn::BeginPlay()
@@ -231,3 +253,83 @@ bool ADronePawn::PickAmmo(int32 PickedAmmo)
 	return true;
 }
 
+void ADronePawn::CreateGameSession()
+{
+	if (!OnlineSessionInterface.IsValid())
+	{
+		return;
+	}
+
+	auto ExistingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession);
+	if (ExistingSession != nullptr)
+	{
+		OnlineSessionInterface->DestroySession(NAME_GameSession);
+	}
+
+	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
+
+	TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
+	SessionSettings->bIsLANMatch = false;
+	SessionSettings->NumPublicConnections = 4;
+	SessionSettings->bAllowJoinInProgress = true;
+	SessionSettings->bAllowJoinViaPresence = true;
+	SessionSettings->bShouldAdvertise = true;
+	SessionSettings->bUsesPresence = true;
+	SessionSettings->bUseLobbiesIfAvailable = true;
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
+}
+
+void ADronePawn::OnCreateGameSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Green,
+				FString::Printf(TEXT("Created session: %s"),
+					*SessionName.ToString())
+			);
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				FString::Printf(TEXT("Failed to create session!")));
+		}
+	}
+}
+
+//void ADronePawn::OpenLobby()
+//{
+//	UWorld* World = GetWorld();
+//
+//	if (World)
+//	{
+//		World->ServerTravel("/Game/Maps/Lobby?listen");
+//	}
+//}
+//
+//void ADronePawn::CallOpenLevel(const FString& Address)
+//{
+//	UGameplayStatics::OpenLevel(this, *Address);
+//}
+//
+//void ADronePawn::CallClientTravel(const FString& Address)
+//{
+//	APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+//
+//	if (PlayerController)
+//	{
+//		PlayerController->ClientTravel(Address,ETravelType::TRAVEL_Absolute);
+//	}
+//}

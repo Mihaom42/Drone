@@ -49,7 +49,7 @@ void UDroneMovementComponent::MoveToUp(float Amount)
 	TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
 
 	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("PitchSpeed: %f"), CurrentPitchSpeed));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("PitchSpeed: %f"), CurrentPitchSpeed));
 }
 
 void UDroneMovementComponent::MoveToRight(float Amount)

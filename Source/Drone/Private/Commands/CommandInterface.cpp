@@ -2,5 +2,3 @@
 
 
 #include "Commands/CommandInterface.h"
-
-// Add default functionality here for any ICommandInterface functions that are not pure virtual.
