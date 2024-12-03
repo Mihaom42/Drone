@@ -33,7 +33,11 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void CreateGameSession();
 
+	UFUNCTION(BlueprintCallable)
+	void JoinGameSession();
+
 	void OnCreateGameSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionComplete(bool bWasSuccessful);
 
 public:
 	void DamageDrone(int32 DamagePoints);
@@ -91,7 +95,8 @@ private:
 	float CurrentRollSpeed;
 
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
-
+	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 //
 //protected:
 //	UFUNCTION(BlueprintCallable)
