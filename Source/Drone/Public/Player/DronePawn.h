@@ -38,6 +38,7 @@ protected:
 
 	void OnCreateGameSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 public:
 	void DamageDrone(int32 DamagePoints);
@@ -96,6 +97,7 @@ private:
 
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 //
 //protected:

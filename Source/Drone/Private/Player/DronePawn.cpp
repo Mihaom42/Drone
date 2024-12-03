@@ -47,6 +47,7 @@ ADronePawn::ADronePawn() /*: CreateSessionCompleteDelegate(FOnCreateSessionCompl
 	
 	CreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateGameSessionComplete);
 	FindSessionCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete);
+	JoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete);
 
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if (OnlineSubsystem)
@@ -297,6 +298,13 @@ void ADronePawn::OnCreateGameSessionComplete(FName SessionName, bool bWasSuccess
 					*SessionName.ToString())
 			);
 		}
+
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			World->ServerTravel(FString("/Game/Maps/Lobby?listen"));
+		}
+
 	}
 	else
 	{
@@ -331,10 +339,18 @@ void ADronePawn::JoinGameSession()
 
 void ADronePawn::OnFindSessionComplete(bool bWasSuccessful)
 {
+	if (!OnlineSessionInterface.IsValid())
+	{
+		return;
+	}
+
 	for (auto Result : SessionSearch->SearchResults)
 	{
 		FString Id = Result.GetSessionIdStr();
 		FString User = Result.Session.OwningUserName;
+
+		FString MatchType;
+		Result.Session.SessionSettings.Get(FName("MatchType"), MatchType);
 
 		if (GEngine)
 		{
@@ -344,6 +360,52 @@ void ADronePawn::OnFindSessionComplete(bool bWasSuccessful)
 				FColor::Cyan,
 				FString::Printf(TEXT("Id: %s, User: %s"), *Id, *User)
 			);
+		}
+
+		if (MatchType == "FreeForAll")
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					15.f,
+					FColor::Yellow,
+					FString::Printf(TEXT("Joining Match Type %s"), *MatchType)
+				);
+			}
+
+			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
+
+			const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+			OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
+		}
+	}
+}
+
+void ADronePawn::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	if (!OnlineSessionInterface.IsValid())
+	{
+		return;
+	}
+
+	FString Address;
+	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Red,
+				FString::Printf(TEXT("Connect string: %s"), *Address)
+			);
+		}
+
+		APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+		if (PlayerController)
+		{
+			PlayerController->ClientTravel(*Address, ETravelType::TRAVEL_Absolute);
 		}
 	}
 }
