@@ -18,11 +18,12 @@ class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup();
+	void MenuSetup(int32 NumberOfPublicConnections = 4, FString TypeOfMatch = FString(TEXT("FreeForAll")));
 
 protected:
 	virtual bool Initialize() override;
-
+	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+	
 private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* HostButton;
@@ -36,6 +37,11 @@ private:
 	UFUNCTION()
 	void JoinButtonClicked();
 
+	void MenuTearDown();
+	
 	// The subsystem designed to handle all online session functionality
 	class UMultiplayerSessionSubsystem* MultiplayerSessionsSubsystem;
+
+	int32 NumPublicConnections;
+	FString MatchType{TEXT("FreeForAll")}; 
 };
