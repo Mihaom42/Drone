@@ -405,7 +405,7 @@ void ADronePawn::OnJoinSessionComplete(FName SessionName, EOnJoinSessionComplete
 		APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
 		if (PlayerController)
 		{
-			PlayerController->ClientTravel(*Address, ETravelType::TRAVEL_Absolute);
+			PlayerController->ClientTravel(*Address, TRAVEL_Absolute);
 		}
 	}
 }

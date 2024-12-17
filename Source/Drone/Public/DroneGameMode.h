@@ -16,5 +16,7 @@ class DRONE_API ADroneGameMode : public AGameModeBase
 
 public:
 	ADroneGameMode();
-	
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 };
