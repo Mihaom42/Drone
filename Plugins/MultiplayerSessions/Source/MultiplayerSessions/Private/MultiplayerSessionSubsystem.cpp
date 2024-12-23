@@ -59,6 +59,7 @@ void UMultiplayerSessionSubsystem::CreateSession(int32 NumPublicConnections, FSt
 		LastSessionSettings->bUseLobbiesIfAvailable = true;
 		LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		LastSessionSettings->BuildUniqueId = 1;
+		LastSessionSettings->bUseLobbiesIfAvailable = true;
 		
 		const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 		if (LocalPlayer != nullptr)
@@ -120,7 +121,7 @@ void UMultiplayerSessionSubsystem::JoinSession(const FOnlineSessionSearchResult&
 
 void UMultiplayerSessionSubsystem::DestroySession()
 {
-	if (SessionInterface.IsValid())
+	if (!SessionInterface.IsValid())
 	{
 		MultiplayerOnDestroySessionComplete.Broadcast(false);
 		return;
