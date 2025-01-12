@@ -47,14 +47,14 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 20.f, GetActorLocation());
 	}*/
 	
-	ADronePawn* DronePawn = Cast<ADronePawn>(Hit.Actor);
+	ADronePawn* DronePawn = Cast<ADronePawn>(Hit.GetActor());
 
 	if (DronePawn != nullptr)
 	{
 		DronePawn->DamageDrone(DroneDamage);
 	}
 
-	ATurretPawn* TurretPawn = Cast<ATurretPawn>(Hit.Actor);
+	ATurretPawn* TurretPawn = Cast<ATurretPawn>(Hit.GetActor());
 
 	if (TurretPawn != nullptr)
 	{
